@@ -1,0 +1,48 @@
+name: Tests
+
+'on':
+  push:               # run tests on any push to any branch
+    branches:
+      - '**'
+  pull_request:       # run tests on every PR into main
+    branches:
+      - main
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Ensure tests were not modified
+        run: |
+          # Compare against base branch if PR, otherwise against origin/main
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }}
+            if ! git diff --quiet origin/${{ github.base_ref }} -- src/test/java; then
+              echo "❌ Tests have been modified. Do not change test files."
+              exit 1
+            fi
+          else
+            git fetch origin main
+            if ! git diff --quiet origin/main -- src/test/java; then
+              echo "❌ Tests have been modified. Do not change test files."
+              exit 1
+            fi
+          fi
+
+      - name: Run all tests with Maven
+        run: mvn -B test
