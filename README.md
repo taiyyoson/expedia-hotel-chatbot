@@ -1,33 +1,193 @@
-# Project 1
+# Hotel Review Search System
 
-@author: taiyyoson
+A Java-based hotel and review search application that allows users to load hotel data and review information from JSON files, then query the data using various search commands.
 
-## Leveraging AI
+## 🏨 Features
 
+- **Hotel Search**: Find hotels by ID with detailed information including name, location, and coordinates
+- **Review Search**: Search for reviews by hotel ID with sorting by date (newest first)
+- **Word Search**: Find reviews containing specific words or phrases
+- **Data Loading**: Load hotel and review data from JSON files and directories
+- **Flexible Arguments**: Support for command-line arguments in any order
 
-After conceptualizing and building out/implementing my design first without the help of AI, I leveraged AI here and there to help flesh and clean out my design. I had a mostly working build initially, but below are the main points I leveraged AI for: 
+## 📋 Prerequisites
 
-- small amounts of research to understand building out a wordIndex data structure to help setup my findWord search method
-    - **what I tried & what suggestions AI made:**
-        - going through slides, old lectures, and code examples went over in class to understand word mapping 
-        - AI suggested a whole new data class that acted as a review wrapper, such that I can find frequency and map it to reviews really easily without the need of extra data structures.
+- Java 24 or higher
+- Maven 3.6+
+- JSON dataset files (hotels and reviews)
 
+## 🚀 Getting Started
 
-- help debugging test cases and cleaning up error handling/validation cases
-    - **what I tried & what suggestions AI made:**
-        - I debugged and fixed up most test cases. I only didn't understand the code logic behind the Professor's invalid queries, where I needed to throw certain exceptions instead of my primitve error handling.
-        - AI helped me implement proper error handling.
+### Building the Project
 
+```bash
+mvn compile
+```
 
-- generating javadocs and ensuring my code styling was consistent throughout and followed the rubric for the whole project
-    - **what I tried & what suggestions AI made:**
-        - Writing javadocs takes forever...:P
+### Running Tests
 
+```bash
+mvn test
+```
 
-## Future Implementation
+### Running the Application
 
-- splitting up DataSearchMain more to delegate its responsibilities into a few more different classes/packages
-- clean up code with more succinct methods where applicable. better code efficiency
-- Possibly using interface logic for our main class - HotelReviewService?
+```bash
+mvn exec:java -Dexec.mainClass="hotelapp.HotelReviewService" -Dexec.args="-hotels dataset/hotels/hotels.json -reviews dataset/reviews"
+```
 
+Or with tiny dataset for testing:
+```bash
+mvn exec:java -Dexec.mainClass="hotelapp.HotelReviewService" -Dexec.args="-hotels dataset/hotelsTiny/hotel1.json -reviews dataset/reviewsTiny"
+```
 
+## 💻 Usage
+
+### Command Line Arguments
+
+The application accepts the following arguments in any order:
+
+- `-hotels <path_to_hotel_file>`: Path to JSON file containing hotel data
+- `-reviews <path_to_reviews_directory>`: Path to directory containing review JSON files
+
+### Query Commands
+
+Once data is loaded, you can process queries using these formats:
+
+1. **Find Hotel by ID**:
+   ```
+   findHotel <hotelId>
+   ```
+   Example: `findHotel 10323`
+
+2. **Find Reviews by Hotel ID**:
+   ```
+   findReviews <hotelId>
+   ```
+   Example: `findReviews 25622`
+
+3. **Find Reviews by Word**:
+   ```
+   findWord <word>
+   ```
+   Example: `findWord excellent`
+
+## 📁 Project Structure
+
+```
+src/
+├── main/java/hotelapp/
+│   ├── HotelReviewService.java      # Main service class
+│   ├── ArgumentParser.java          # Command-line argument parser
+│   ├── DataSearchMain.java          # Core data search functionality
+│   ├── ParseHotel.java             # Hotel JSON parser
+│   ├── ParseReview.java            # Review JSON parser
+│   └── datatypes/
+│       ├── Hotel.java              # Hotel data model
+│       ├── Review.java             # Review data model
+│       └── WordFrequency.java      # Word frequency data model
+└── test/java/
+    ├── SearchHotelTest.java        # Hotel search tests
+    ├── SearchReviewsTest.java      # Review search tests
+    ├── SearchByWordTest.java       # Word search tests
+    ├── SearchInvalidQueriesTest.java # Invalid query tests
+    └── ArgUtil.java                # Test utility for arguments
+```
+
+## 🗃️ Data Format
+
+### Hotel JSON Structure
+```json
+{
+  "sr": [
+    {
+      "id": "12539",
+      "f": "Hotel Name",
+      "ad": "Street Address",
+      "ci": "City",
+      "ll": {
+        "lat": "37.784580",
+        "lng": "-122.408540"
+      }
+    }
+  ]
+}
+```
+
+### Review JSON Structure
+```json
+{
+  "reviewDetails": {
+    "hotelId": "25622",
+    "reviewId": "123456",
+    "ratingOverall": 4,
+    "title": "Review Title",
+    "reviewText": "Review content...",
+    "userNickname": "Username",
+    "reviewSubmissionTime": "2021-01-15T10:30:00Z"
+  }
+}
+```
+
+## 🏗️ Architecture
+
+The application follows a clean architecture pattern:
+
+- **Service Layer**: `HotelReviewService` - Main entry point and coordination
+- **Parsing Layer**: `ParseHotel`, `ParseReview` - JSON data parsing
+- **Data Layer**: `DataSearchMain` - Core business logic and data structures
+- **Models**: `Hotel`, `Review`, `WordFrequency` - Data transfer objects
+- **Utilities**: `ArgumentParser` - Command-line argument processing
+
+## 🧪 Testing
+
+The project includes comprehensive test coverage:
+
+- **Hotel Search Tests**: Verify hotel lookup functionality
+- **Review Search Tests**: Test review retrieval by hotel ID
+- **Word Search Tests**: Validate text-based search capabilities
+- **Invalid Query Tests**: Ensure proper error handling
+
+Run all tests with:
+```bash
+mvn test
+```
+
+## 📊 Dependencies
+
+- **JUnit 5**: Testing framework
+- **Gson**: JSON parsing and serialization
+- **Maven Surefire**: Test execution
+
+## 🔧 Development
+
+### Code Style
+- Follow Java naming conventions
+- Use meaningful variable and method names
+- Include comprehensive JavaDoc documentation
+- Maintain separation of concerns between classes
+
+### Adding New Features
+1. Create appropriate data models in `datatypes` package
+2. Add parsing logic if needed
+3. Extend `DataSearchMain` for new query types
+4. Update `HotelReviewService` to handle new commands
+5. Add corresponding tests
+
+## 📈 Performance Considerations
+
+- Reviews are sorted by date (newest first) then by review ID
+- Hotel data is loaded into memory for fast lookups
+- Word search is case-insensitive and supports partial matching
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📄 License
+
+This project is part of an academic assignment and is for educational purposes.
